@@ -9,58 +9,65 @@ class GildedRose {
 
     public void updateQuality() {
         for (Item item : items) {
+            if (isSulfuras(item)) {
+                continue;
+            }
+
+            item.sellIn = item.sellIn - 1;
             updateQualityOnItem(item);
         }
     }
 
     public void updateQualityOnItem(Item item) {
-        if (!item.name.equals("Aged Brie")
-                && !item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-            if (item.quality > 0) {
-                if (!isSulfuras(item)) {
-                    item.quality = item.quality - 1;
-                }
+
+        if (itemDegradesInQuality(item)) {
+            subtractQuality(item);
+            if (item.sellIn < 0) {
+                subtractQuality(item);
             }
         } else {
-            if (item.quality < 50) {
-                item.quality = item.quality + 1;
-
-                if (item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-                    if (item.sellIn < 11) {
-                        if (item.quality < 50) {
-                            item.quality = item.quality + 1;
-                        }
-                    }
-
-                    if (item.sellIn < 6) {
-                        if (item.quality < 50) {
-                            item.quality = item.quality + 1;
-                        }
-                    }
-                }
+            if (item.sellIn < 0) {
+                increaseQualityToMax50(item);
             }
         }
 
-        if (!isSulfuras(item)) {
-            item.sellIn = item.sellIn - 1;
-        }
 
-        if (item.sellIn < 0) {
-            if (!item.name.equals("Aged Brie")) {
-                if (!item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
-                    if (item.quality > 0) {
-                        if (!isSulfuras(item)) {
-                            item.quality = item.quality - 1;
-                        }
-                    }
-                } else {
-                    item.quality = 0;
-                }
-            } else {
-                if (item.quality < 50) {
-                    item.quality = item.quality + 1;
+        if (item.name.equals("Aged Brie")) {
+            increaseQualityToMax50(item);
+
+        }
+        if (item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
+            increaseQualityToMax50(item);
+            if (item.sellIn < 10) {
+                increaseQualityToMax50(item);
+                if (item.sellIn < 5) {
+                    increaseQualityToMax50(item);
                 }
             }
+
+        }
+
+
+        if (item.sellIn < 0 && item.name.equals("Backstage passes to a TAFKAL80ETC concert")) {
+            item.quality = 0;
+        }
+
+    }
+
+    private boolean itemDegradesInQuality(Item item) {
+        return !item.name.equals("Aged Brie")
+                && !item.name.equals("Backstage passes to a TAFKAL80ETC concert");
+    }
+
+    private void increaseQualityToMax50(Item item) {
+        if (item.quality < 50) {
+            item.quality = item.quality + 1;
+        }
+    }
+
+    private void subtractQuality(Item item) {
+        if (item.quality > 0) {
+            item.quality = item.quality - 1;
         }
     }
 
